@@ -7,39 +7,16 @@
 
 import UIKit
 
-enum PomodoroState {
-    case focus
-    case shortBreak
-    case longBreak
-
-    var duration: Int { // seconds
-        switch self {
-        case .focus: return 25 * 60
-        case .shortBreak: return 5 * 60
-        case .longBreak: return 15 * 60
-        }
-    }
-
-    var themeColor: UIColor {
-        switch self {
-        case .focus:
-            return DesignSystem.Colors.red ?? .systemRed
-        case .shortBreak:
-            return DesignSystem.Colors.blue ?? .systemBlue
-        case .longBreak:
-            return DesignSystem.Colors.yellow ?? .systemYellow
-        }
-    }
-}
-
 final class PomodoroViewController: UIViewController {
     
     // MARK: - Properties
     private let timerService = TimerService()
     private var currentState: PomodoroState = .focus
+    private var isSessionStarted = false
     
     // MARK: - UI Components
     private let timerView = BauhausTimerView()
+    private let taskField = BauhausTaskField()
     
     private let startButton = BauhausButton(title: "START", color: (DesignSystem.Colors.red ?? .systemRed))
     
@@ -76,6 +53,10 @@ final class PomodoroViewController: UIViewController {
         view.addSubview(startButton)
         startButton.addTarget(self, action: #selector(handleStart), for: .touchUpInside)
         
+        // Task Field
+        taskField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(taskField)
+        
         // Layout Constraints
         NSLayoutConstraint.activate([
             // Mode Stack
@@ -94,16 +75,23 @@ final class PomodoroViewController: UIViewController {
             startButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             startButton.widthAnchor.constraint(equalToConstant: 200),
-            startButton.heightAnchor.constraint(equalToConstant: 60)
+            startButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            taskField.topAnchor.constraint(equalTo: timerView.bottomAnchor, constant: 30),
+                taskField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                taskField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                taskField.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
     private func setupModeButtons() {
-        let modes: [(String, PomodoroState)] = [("FOCUS", .focus), ("SHORT", .shortBreak), ("LONG", .longBreak)]
+        let modes: [PomodoroState] = [
+            .shortBreak, .longBreak, .focus
+        ]
         
         for mode in modes {
             let btn = UIButton(type: .system)
-            btn.setTitle(mode.0, for: UIControl.State.normal)
+            btn.setTitle(mode.title, for: UIControl.State.normal)
             btn.backgroundColor = (DesignSystem.Colors.black ?? .black)
             btn.setTitleColor(.white, for: UIControl.State.normal)
             btn.titleLabel?.font = DesignSystem.Typography.mediumFont(size: 14)
@@ -118,24 +106,47 @@ final class PomodoroViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func handleStart() {
-        timerService.start(minutes: currentState.duration / 60)
-        startButton.setTitle("PAUSE", for: UIControl.State.normal)
-        startButton.backgroundColor = (DesignSystem.Colors.black ?? .black)
+        if timerService.isTimerRunning {
+            
+            timerService.pause()
+            startButton.setTitle("RESUME", for: .normal)
+            startButton.backgroundColor = DesignSystem.Colors.yellow
+            startButton.setTitleColor(.bauhausBlack, for: .normal)
+        } else {
+            if isSessionStarted {
+                timerService.resume()
+            } else {
+                timerService.startNewSession(minutes: currentState.duration / 60)
+                isSessionStarted = true
+            }
+            
+            startButton.setTitle("PAUSE", for: .normal)
+                        startButton.backgroundColor = currentState.themeColor
+                        startButton.setTitleColor(.bauhausOffWhite, for: .normal)
+        }
     }
     
     @objc private func changeMode(_ sender: UIButton) {
-        guard let title = sender.currentTitle else { return }
-        switch title {
-        case "FOCUS": currentState = PomodoroState.focus
-        case "SHORT": currentState = PomodoroState.shortBreak
-        default: currentState = PomodoroState.longBreak
+            timerService.stop()
+            isSessionStarted = false
+            
+            guard let title = sender.currentTitle else { return }
+            
+            switch title {
+            case "FOCUS": currentState = .focus
+            case "SHORT": currentState = .shortBreak
+            default: currentState = .longBreak
+            }
+            
+            timerView.timerLabel.text = String(format: "%02d:00", currentState.duration / 60)
+            timerView.updateProgress(0, color: currentState.themeColor)
+            
+            startButton.setTitle("START", for: .normal)
+            startButton.backgroundColor = currentState.themeColor
+            
+            modeStackView.arrangedSubviews.forEach { $0.alpha = 0.5 }
+            sender.alpha = 1.0
         }
-        
-        timerView.timerLabel.text = String(format: "%02d:00", currentState.duration / 60)
-        startButton.backgroundColor = currentState.themeColor
-        modeStackView.arrangedSubviews.forEach { $0.alpha = 0.5 }
-        sender.alpha = 1.0
-    }
 }
 
 // MARK: - TimerServiceDelegate
@@ -146,14 +157,13 @@ extension PomodoroViewController: TimerServiceDelegate {
     }
     
     func timerDidFinish() {
-        // Call Notification Services
+        isSessionStarted = false
+        
         NotificationService.shared.playCompletionHaptics()
         NotificationService.shared.playSound()
-        
-        // Virsual Effects
         flashScreen()
         
-        startButton.setTitle("COMPLETED", for: .normal)
+        startButton.setTitle("START", for: .normal)
         startButton.backgroundColor = DesignSystem.Colors.black
     }
     
@@ -167,3 +177,4 @@ extension PomodoroViewController: TimerServiceDelegate {
         }
     }
 }
+

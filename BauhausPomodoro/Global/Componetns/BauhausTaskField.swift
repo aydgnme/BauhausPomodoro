@@ -9,12 +9,35 @@ import UIKit
 
 class BauhausTaskField: UIView {
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    private let textField: UITextField = {
+        let tf = UITextField()
+        tf.placeholder = "WRITE TASK..."
+        tf.font = DesignSystem.Typography.mediumFont(size: 16)
+        tf.textAlignment = .center
+        tf.backgroundColor = .clear
+        tf.translatesAutoresizingMaskIntoConstraints = false
+        return tf
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
     }
-    */
-
+    
+    private func setupView() {
+            backgroundColor = .white
+            layer.borderWidth = 3
+            layer.borderColor = (DesignSystem.Colors.black ?? .black).cgColor
+            
+            addSubview(textField)
+            NSLayoutConstraint.activate([
+                textField.topAnchor.constraint(equalTo: topAnchor),
+                textField.bottomAnchor.constraint(equalTo: bottomAnchor),
+                textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+                textField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10)
+            ])
+        }
+        
+        required init?(coder: NSCoder) { fatalError() }
 }
+
