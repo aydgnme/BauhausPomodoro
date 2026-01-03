@@ -14,7 +14,7 @@
 		DC239D172F0932A9003AB48F /* Exceptions for "BauhausPomodoro" folder in "BauhausPomodoro" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = DC239D042F0932A8003AB48F /* BauhausPomodoro */;
 		};
