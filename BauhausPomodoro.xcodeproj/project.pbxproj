@@ -147,7 +147,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8YP6GH5LF7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BauhausPomodoro/Info.plist;
+				INFOPLIST_FILE = BauhausPomodoro/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PomoBauhaus;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -180,7 +180,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8YP6GH5LF7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BauhausPomodoro/Info.plist;
+				INFOPLIST_FILE = BauhausPomodoro/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PomoBauhaus;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

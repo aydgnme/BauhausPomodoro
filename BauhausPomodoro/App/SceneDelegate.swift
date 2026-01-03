@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         
-        let mainVC = ViewController()
+        let mainVC = PomodoroViewController()
         let navigationController = UINavigationController(rootViewController: mainVC)
         
         window.rootViewController = navigationController
