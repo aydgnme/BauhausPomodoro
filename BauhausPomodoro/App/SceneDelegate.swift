@@ -14,13 +14,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
         let window = UIWindow(windowScene: windowScene)
         
-        let mainVC = PomodoroViewController()
-        let navigationController = UINavigationController(rootViewController: mainVC)
+        // ROOT ARTIK TASK LIST
+        let rootVC = TaskListViewController()
+        let navigationController = UINavigationController(rootViewController: rootVC)
+        
+        // Navigation Bar Rengini Bauhaus yapalım
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = DesignSystem.Colors.background
+        appearance.titleTextAttributes = [.font: DesignSystem.Typography.boldFont(size: 20)]
+        
+        navigationController.navigationBar.standardAppearance = appearance
+        navigationController.navigationBar.scrollEdgeAppearance = appearance
+        navigationController.navigationBar.tintColor = DesignSystem.Colors.black // Geri butonu siyah olsun
         
         window.rootViewController = navigationController
-        
         self.window = window
         window.makeKeyAndVisible()
     }
