@@ -17,6 +17,8 @@ final class PersistenceService {
         static let dailySessionCount = "dailySessionCount"
         static let lastTask = "lastTask"
         static let lastDate = "lastDate"
+        
+        static let subTaskMap = "subTaskMap"
     }
     
     private init() {}
@@ -56,5 +58,23 @@ final class PersistenceService {
     private func resetDailyStats() {
         defaults.set(0, forKey: Keys.dailySessionCount)
         defaults.set(Date(), forKey: Keys.lastDate)
+    }
+    
+    
+    // MARK: - Sub-Task Logic
+    func saveSubTask(_ subTask: String, for mainTaskId: UUID) {
+        var map = defaults.dictionary(forKey: Keys.subTaskMap) as? [String: String] ?? [:]
+        map[mainTaskId.uuidString] = subTask
+        defaults.set(map, forKey: Keys.subTaskMap)
+    }
+    
+    func getLastSubTask(for mainTaskId: UUID) -> String? {
+        let map = defaults.dictionary(forKey: Keys.subTaskMap) as? [String: String] ?? [:]
+        return map[mainTaskId.uuidString]
+    }
+    
+    func logCompletedSession(mainTask: String, subTask: String?) {
+        print("LOG: Main: \(mainTask) | Sub: \(subTask ?? "Main Focus") | Date: \(Date())")
+        incrementSessionCount()
     }
 }
